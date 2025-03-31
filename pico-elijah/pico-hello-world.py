@@ -1,10 +1,14 @@
-from machine import Pin
+from machine import Pin # type: ignore
 from time import sleep
 
-led = Pin('LED', Pin.OUT)  # Create a pin object for the built-in LED
-print ("Blinking LED example")
+pin = Pin("LED", Pin.OUT)
 
+print("LED starts flashing...")
 while True:
-    led.value(not led.value())  # Toggle the LED state
-    sleep(0.5)  # Wait for 0.5 seconds
-# The code above is a simple program that blinks the built-in LED on the Pico board.    
+    try:
+        pin.toggle()
+        sleep(1) # sleep 1sec
+    except KeyboardInterrupt:
+        break
+pin.off()
+print("Finished.")
