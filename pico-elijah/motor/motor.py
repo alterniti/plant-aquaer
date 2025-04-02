@@ -8,5 +8,5 @@ motor1 = Pin(16, Pin.OUT) # IN1
 # Motor Funtions
 def motor_on():
     motor1.value(1) # Turn on the motor by setting IN1 high
-    print("Motor is ON") 
-    
+def motor_off():
+    motor1.value(0) # Turn off the motor by setting IN1 low
