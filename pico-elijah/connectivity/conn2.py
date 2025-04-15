@@ -5,7 +5,6 @@ import machine
 import rp2
 import sys
 from machine import Pin
-from time import sleep
 
 ssid = 'Eli-comp'
 password = 'pico-2-w@s'
