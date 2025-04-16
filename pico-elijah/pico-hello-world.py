@@ -3,7 +3,6 @@ from time import sleep
 
 pin = Pin("LED", Pin.OUT)
 
-print("LED starts flashing...")
 while True:
     try:
         pin.toggle()
