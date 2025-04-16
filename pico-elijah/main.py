@@ -64,17 +64,31 @@ class pump:
         pass
 
 class sensors:
-    def __init__(self, type: str, pin: int):
+    def __init__(self, s_type: str, pinIN: int,pinOUT: int):
         # params:
         # type:: MOISTURE or FLOW
         # pin:: GPID
-        name=type.join(str(pin))
+        name=s_type.join(str(pinIN).join(str(pinOUT)))
+        if s_type=="MOISTURE":
+            self.s_type="MOISTURE"
+            self.control=machine.Pin(pinOUT, machine.Pin.OUT)
+            self.signal=machine.ADC(pinIN)
+        if s_type=="FLOW":
+            self.s_type="FLOW"
+            self.control=machine.Pin(pinOUT, machine.Pin.OUT)
+            self.signal=machine.ADC(pinIN)
         return name
 
     def get_moisture(self):
         pass
+
     def is_moist(self):
-        pass
+        if not self.s_type=="MOISTURE":
+            print("invalid sensor")
+        if moisture_level < 35000: 
+            return True
+        else:
+            return False
 
     def get_flow(self):
         pass
