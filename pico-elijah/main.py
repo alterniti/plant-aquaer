@@ -205,19 +205,26 @@ s1=Sensor("MOISTURE",28,20)
 s2=Sensor("MOISTURE",27,21)
 s3=Sensor("FLOW",26,19)
 led2=Led(18)
-pm=Pump(17)
+pm=Pump(27)
 for device in m.update_devices():
     print(device)
 for x in range(1,3):    
     led.blink()
-cnct=Connect()
-cnct.connect(testing_led=led)
-while not cnct.wlan.isconnected():
-    led.off()
-    print("connecting...")
+# cnct=Connect()
+# cnct.connect(testing_led=led)
+# while not cnct.wlan.isconnected():
+#     led.blink()
+#     print("connecting...")
+# print("connected")
+# led.on()
+
+while(True):
+    pm.on()
+    led.on()
     sleep(0.5)
-print("connected")
-led.on()
+    pm.off()
+    led.off()
+    sleep(0.5)
 
 # m.test_headless(led)
 # aioble.central.scan(10000, interval_us=12000, window_us=10000, active=True) #bluetooth testing
