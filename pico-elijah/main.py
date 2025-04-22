@@ -39,7 +39,7 @@ class Connect:
     def list_networks(self):
         print(self.wlan.scan())
 
-    def connect(self, ssid=None, testing_blink=False, testing_led=None):
+    def connect(self, ssid=None, testing_led=None):
         '''
         Automatically connects to nearby known networks \n
         If ssid arg given, connects to that network
@@ -70,13 +70,17 @@ class Connect:
                     print(f"connecting to {saved_net['ssid']}...")
                     try:
                         self.wlan.connect(saved_net['ssid'],saved_net['passw'])
-                        if testing_blink==True:
+                        if testing_led:
                             testing_led.blink() # type: ignore
+                            while not cnct.wlan.isconnected():
+                                testing_led.blink() #type: ignore
+                                print("connecting...")
+                            testing_led.on()
                         print("connected")
                         break
                     except:
                         print("connection failed")
-                        if testing_blink==True:
+                        if testing_led:
                             testing_led.off() # type: ignore
 
     def ping(self,server_ip,password,data):
@@ -102,7 +106,7 @@ class Led:
     def __init__(
             self,
             pinid,
-            color="WHITE"
+            color="WHITE",
         ):
         self.control=machine.Pin(pinid, machine.Pin.OUT)
         self.pin=pinid
@@ -110,6 +114,36 @@ class Led:
         self.name=f"LED{color}.{pinid}"
         self.info={self.name:{"color":self.color,"control":self.pin,"class":self.__class__}}
         self.__class__.all_units.update(self.info)
+
+    def config_rgb(self, r_pin, g_pin, b_pin):
+        self.r_pin=r_pin
+        self.g_pin=g_pin
+        self.b_pin=b_pin
+        self.rgb_control=[machine.Pin(r_pin, machine.Pin.OUT),machine.Pin(b_pin, machine.Pin.OUT),machine.Pin(g_pin, machine.Pin.OUT)]
+        self.color="RGB"
+        self.name=f"LED{self.color}.{r_pin}-{g_pin}-{b_pin}"
+        self.info={self.name:{"color":self.color,"control":self.rgb_control,"class":self.__class__}}
+        self.__class__.all_units.update(self.info)
+
+    def rgb_color(self, color):
+        '''
+        "w","r","g","b" for white, red, green, or blue respectively. 
+        '''
+        if color=="w":
+            for i in self.rgb_control:
+                i.on()
+        if color=="r":
+            self.rgb_control[0].on()
+            self.rgb_control[1].off()
+            self.rgb_control[2].off()
+        if color=="g":
+            self.rgb_control[0].off()
+            self.rgb_control[1].on()
+            self.rgb_control[2].off()
+        if color=="b":
+            self.rgb_control[0].off()
+            self.rgb_control[1].off()
+            self.rgb_control[2].on()
 
     def blink(self, duration=0.5):
         self.control.on()
@@ -186,10 +220,28 @@ class Main:
         print("==================================================\
             \nPlant Aquaer\nA project for PLTW's EDD course\n\nBy Gatlin Meyer, Brandon Peterson, and Elijah Ross\
             \n==================================================\n")
+        board_led=machine.Pin("LED",machine.Pin.OUT)
+        for i in range(0,6):
+            board_led.toggle()
+            sleep(0.1)
+        board_led.off()
         
     def test_headless(self, led):
         while True:
             led.blink()
+
+    def test_motor(self, motor, indicator=None, cycle_limit=None, interval=0.5):
+        def toggle_motor():
+            if indicator:
+                indicator.control.toggle()
+            motor.control.toggle()
+            sleep(interval)
+        if cycle_limit:
+            for x in range(0,cycle_limit):
+                toggle_motor()
+        else:
+            while True:
+                toggle_motor()
     
     def update_devices(self):
         all_devices.update(Sensor.all_units)
@@ -208,23 +260,10 @@ led2=Led(18)
 pm=Pump(27)
 for device in m.update_devices():
     print(device)
-for x in range(1,3):    
-    led.blink()
-# cnct=Connect()
-# cnct.connect(testing_led=led)
-# while not cnct.wlan.isconnected():
-#     led.blink()
-#     print("connecting...")
-# print("connected")
-# led.on()
 
-while(True):
-    pm.on()
-    led.on()
-    sleep(0.5)
-    pm.off()
-    led.off()
-    sleep(0.5)
+cnct=Connect()
+cnct.connect(testing_led=led)
 
-# m.test_headless(led)
+# m.test_motor(pm)
+
 # aioble.central.scan(10000, interval_us=12000, window_us=10000, active=True) #bluetooth testing
