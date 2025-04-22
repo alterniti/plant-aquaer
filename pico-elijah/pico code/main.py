@@ -180,7 +180,7 @@ class Sensor:
         self.control.on()
         sig=self.signal
         self.control.off()
-        return sig
+        return int(sig)
 
     def is_moist(self,threshold=35000):
         '''
@@ -225,6 +225,51 @@ class Main:
             board_led.toggle()
             sleep(0.1)
         board_led.off()
+
+    def config_devices(self):
+        """Initializes the default device names and declares them as global
+
+        Return: None
+        """
+        global pump0,moist0,moist1,moist2,led0,conn0
+        #pump
+        pump0=Pump(16)
+        #sensors
+        moist0=Sensor("MOISTURE",26,20)
+        moist1=Sensor("MOISTURE",27,21)
+        moist2=Sensor("MOISTURE",28,22)
+        #indicator
+        led0=Led("LED","GREEN")
+        #connection
+        conn0=Connect()
+
+    def headless(self):
+        global_cycles=-1
+        self.config_devices()
+        moist_threshold=36000
+        led0.blink()
+        while True:
+            global_cycles+=1
+            motor_cycles=0
+            moisture=(moist0.get_moisture()+moist1.get_moisture()+moist2.get_moisture())
+            moisture=moisture/3
+            if moisture>moist_threshold:
+                soil_moist=True
+                prewater_moist=moisture
+                while moisture>moist_threshold:
+                    motor_cycles+=1
+                    pump0.on()
+                    sleep(10)
+                    moisture=(moist0.get_moisture()+moist1.get_moisture()+moist2.get_moisture())
+                    moisture=moisture/3
+                    if motor_cycles>1: #if been running for more than 20 secs
+                        if prewater_moist-moisture<5000: # if the moisture hasn't really changed
+                            print("make sure pump and hose are connected properly!")
+                            break
+                pump0.off()
+            else:
+                soil_moist=False
+            sleep(60*60*24) #60 sec x 60 min x 24 hours
         
     def test_headless(self, led):
         while True:
@@ -263,6 +308,8 @@ for device in m.update_devices():
 
 cnct=Connect()
 cnct.connect(testing_led=led)
+
+m.headless()
 
 # m.test_motor(pm)
 
