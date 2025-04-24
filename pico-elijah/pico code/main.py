@@ -10,8 +10,10 @@ import sys #type: ignore
 from time import sleep #type: ignore
 import aioble 
 import urequests
-
 class Connect:
+    """network connection object
+    """
+    
     net_creds={
         "Eli-comp":{
             "ssid":"Eli-comp",
@@ -158,6 +160,14 @@ class Led:
         self.control.off()
 
 class Sensor:
+    """represents a sensor object\n
+    
+    Keyword arguments:\n
+    s_type -- MOISTURE or FLOW\n
+    pinIN -- the ADC pin from which data is read\n
+    pinOUT -- the control pin; turns the sensor on or off\n
+    Return: None
+    """
     all_units={}
     def __init__(self, s_type: str, pinIN: int,pinOUT: int):
         # params:
@@ -210,6 +220,13 @@ class Sensor:
         pass
 
 class Main:
+    """main functions\n
+    
+    Keyword arguments:
+    none
+    Return: None
+    """
+    
     global all_devices
     all_devices={}
 
@@ -256,15 +273,18 @@ class Main:
             if moisture>moist_threshold:
                 soil_moist=True
                 prewater_moist=moisture
+                print(f"pump OFF | moisture: {moisture}")
                 while moisture>moist_threshold:
                     motor_cycles+=1
                     pump0.on()
-                    sleep(10)
+                    print(f"pump ON | motor cycles: {motor_cycles} | moisture {moisture}")
+                    sleep(5)
                     moisture=(moist0.get_moisture()+moist1.get_moisture()+moist2.get_moisture())
                     moisture=moisture/3
                     if motor_cycles>1: #if been running for more than 20 secs
                         if prewater_moist-moisture<5000: # if the moisture hasn't really changed
                             print("make sure pump and hose are connected properly!")
+                            pump0.off()
                             break
                 pump0.off()
             else:
@@ -312,5 +332,3 @@ cnct.connect(testing_led=led)
 m.headless()
 
 # m.test_motor(pm)
-
-# aioble.central.scan(10000, interval_us=12000, window_us=10000, active=True) #bluetooth testing
