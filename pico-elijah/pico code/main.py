@@ -250,7 +250,7 @@ class Main:
         """
         global pump0,moist0,moist1,moist2,led0,conn0
         #pump
-        pump0=Pump(16)
+        pump0=Pump(28)
         #sensors
         moist0=Sensor("MOISTURE",26,20)
         moist1=Sensor("MOISTURE",27,21)
@@ -268,19 +268,20 @@ class Main:
         while True:
             global_cycles+=1
             motor_cycles=0
-            moisture=(moist0.get_moisture()+moist1.get_moisture()+moist2.get_moisture())
-            moisture=moisture/3
+            moisture=moist0.get_moisture()
+            # moisture=(moist0.get_moisture()+moist1.get_moisture()+moist2.get_moisture())
+            # moisture=moisture/3
             if moisture>moist_threshold:
                 soil_moist=True
                 prewater_moist=moisture
-                print(f"pump OFF | moisture: {moisture}")
                 while moisture>moist_threshold:
                     motor_cycles+=1
                     pump0.on()
                     print(f"pump ON | motor cycles: {motor_cycles} | moisture {moisture}")
                     sleep(5)
-                    moisture=(moist0.get_moisture()+moist1.get_moisture()+moist2.get_moisture())
-                    moisture=moisture/3
+                    moisture=moist0.get_moisture()
+                    # moisture=(moist0.get_moisture()+moist1.get_moisture()+moist2.get_moisture())
+                    # moisture=moisture/3
                     if motor_cycles>1: #if been running for more than 20 secs
                         if prewater_moist-moisture<5000: # if the moisture hasn't really changed
                             print("make sure pump and hose are connected properly!")
@@ -289,7 +290,9 @@ class Main:
                 pump0.off()
             else:
                 soil_moist=False
-            sleep(60*60*24) #60 sec x 60 min x 24 hours
+                print(f"pump OFF | moisture: {moisture}")
+            sleep(5)
+            # sleep(60*60*24) #60 sec x 60 min x 24 hours
         
     def test_headless(self, led):
         while True:
