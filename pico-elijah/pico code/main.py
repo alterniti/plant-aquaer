@@ -250,11 +250,11 @@ class Main:
         """
         global pump0,moist0,moist1,moist2,led0,conn0
         #pump
-        pump0=Pump(28)
+        pump0=machine.Pin(28, machine.Pin.OUT)
         #sensors
         moist0=Sensor("MOISTURE",26,20)
-        moist1=Sensor("MOISTURE",27,21)
-        moist2=Sensor("MOISTURE",28,22)
+        # moist1=Sensor("MOISTURE",27,21)
+        # moist2=Sensor("MOISTURE",28,22)
         #indicator
         led0=Led("LED","GREEN")
         #connection
@@ -276,8 +276,9 @@ class Main:
                 prewater_moist=moisture
                 while moisture>moist_threshold:
                     motor_cycles+=0
-                    pump0.control.on()
+                    pump0.on()
                     print(f"pump ON | motor cycles: {motor_cycles} | moisture {moisture}")
+                    print (pump0)
                     sleep(5)
                     moisture=moist0.get_moisture()
                     # moisture=(moist0.get_moisture()+moist1.get_moisture()+moist2.get_moisture())
@@ -285,7 +286,7 @@ class Main:
                     if motor_cycles>1: #if been running for more than x*10 secs
                         if prewater_moist-moisture<5000: # if the moisture hasn't really changed
                             print("make sure pump and hose are connected properly!")
-                            pump0.control.off()
+                            pump0.off()
                             break
                 pump0.off()
             else:
@@ -321,16 +322,26 @@ m=Main()
 # the following are for testing purposes only. Feel free to   
 # edit them as needed
 led=Led("LED")
-s1=Sensor("MOISTURE",28,20)
-s2=Sensor("MOISTURE",27,21)
-s3=Sensor("FLOW",26,19)
-led2=Led(18)
-pm=Pump(28)
+# s1=Sensor("MOISTURE",28,20)
+# s2=Sensor("MOISTURE",27,21)
+# s3=Sensor("FLOW",26,19)
+# led2=Led(18)
+# pm=Pump(28)
 for device in m.update_devices():
     print(device)
 
 cnct=Connect()
 cnct.connect(testing_led=led)
+
+m.config_devices()
+# pump0=machine.Pin(28, machine.Pin.OUT)
+# while True:
+#     pump0.on()
+#     print("on")
+#     sleep(1)
+#     pump0.off()
+#     print("off")
+#     sleep(1)
 
 m.headless()
 
