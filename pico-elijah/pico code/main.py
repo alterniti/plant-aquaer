@@ -282,7 +282,7 @@ class Main:
                     moisture=moist0.get_moisture()
                     # moisture=(moist0.get_moisture()+moist1.get_moisture()+moist2.get_moisture())
                     # moisture=moisture/3
-                    if motor_cycles>1: #if been running for more than 20 secs
+                    if motor_cycles>1: #if been running for more than x*10 secs
                         if prewater_moist-moisture<5000: # if the moisture hasn't really changed
                             print("make sure pump and hose are connected properly!")
                             pump0.off()
