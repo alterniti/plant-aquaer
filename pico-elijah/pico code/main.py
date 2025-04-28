@@ -178,7 +178,7 @@ class Sensor:
         if s_type=="MOISTURE":
             self.s_type="MOISTURE"
             self.control=machine.Pin(pinOUT, machine.Pin.OUT)
-            self.signal=machine.ADC(pinIN).read_u16()
+            self.signal=machine.ADC(pinIN)
         if s_type=="FLOW":
             self.s_type="FLOW"
             self.control=machine.Pin(pinOUT, machine.Pin.OUT)
@@ -188,7 +188,7 @@ class Sensor:
 
     def get_moisture(self):
         self.control.on()
-        sig=self.signal
+        sig=self.signal.read_u16()
         self.control.off()
         return int(sig)
 
@@ -275,8 +275,8 @@ class Main:
                 soil_moist=True
                 prewater_moist=moisture
                 while moisture>moist_threshold:
-                    motor_cycles+=1
-                    pump0.on()
+                    motor_cycles+=0
+                    pump0.control.on()
                     print(f"pump ON | motor cycles: {motor_cycles} | moisture {moisture}")
                     sleep(5)
                     moisture=moist0.get_moisture()
@@ -285,13 +285,13 @@ class Main:
                     if motor_cycles>1: #if been running for more than 20 secs
                         if prewater_moist-moisture<5000: # if the moisture hasn't really changed
                             print("make sure pump and hose are connected properly!")
-                            pump0.off()
+                            pump0.control.off()
                             break
                 pump0.off()
             else:
                 soil_moist=False
                 print(f"pump OFF | moisture: {moisture}")
-            sleep(5)
+            sleep(1)
             # sleep(60*60*24) #60 sec x 60 min x 24 hours
         
     def test_headless(self, led):
@@ -325,7 +325,7 @@ s1=Sensor("MOISTURE",28,20)
 s2=Sensor("MOISTURE",27,21)
 s3=Sensor("FLOW",26,19)
 led2=Led(18)
-pm=Pump(27)
+pm=Pump(28)
 for device in m.update_devices():
     print(device)
 

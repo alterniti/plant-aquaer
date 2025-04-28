@@ -23,7 +23,4 @@ while True:
         print("Motor ON: Pumping Water")
         motor.on()
         time.sleep(5)  # Run motor for 5 seconds
-        motor.off()
-        print("Motor OFF: Pump Stopped")
-    
     time.sleep(2)
