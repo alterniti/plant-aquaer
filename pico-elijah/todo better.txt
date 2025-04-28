@@ -1,0 +1,6 @@
+- we would support multiple moisture sensors
+- many of the mounts and parts would be improved for easier assembly
+- we would incorporate wireless connection 
+
+- we would attempt longer-term testing, with tests over weeks or even longer 
+- we would also gather more data to determine how long the soil takes to dry, and how much water we need for watering the plant
