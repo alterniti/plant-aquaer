@@ -14,7 +14,7 @@ class Connect:
     """network connection object
     """
     
-    net_creds={
+    net_creds={ #these are all hotspots so chill
         "Eli-comp":{
             "ssid":"Eli-comp",
             "passw":"pico-2-w@s"
@@ -188,7 +188,7 @@ class Sensor:
 
     def get_moisture(self):
         self.control.on()
-        sig=self.signal.read_u16()
+        sig=self.control.read_u16()
         self.control.off()
         return int(sig)
 
