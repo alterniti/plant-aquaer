@@ -11,7 +11,7 @@ import time
 
 # define UUIDs for service / characteristic
 _SERVICE_UUID = bluetooth.UUID(0x1848)
-_CHARACTERISTIC_UUIS = bluetooth.UUID(0x2A6E)
+_CHARACTERISTIC_UUID = bluetooth.UUID(0x2A6E)
 
 IAM = "central"
 

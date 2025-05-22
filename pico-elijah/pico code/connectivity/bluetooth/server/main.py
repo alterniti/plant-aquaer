@@ -11,7 +11,7 @@ import time
 
 # define UUIDs for service / characteristic
 _SERVICE_UUID = bluetooth.UUID(0x1848)
-_CHARACTERISTIC_UUIS = bluetooth.UUID(0x2A6E)
+_CHARACTERISTIC_UUID = bluetooth.UUID(0x2A6E)
 
 IAM = "central"
 
@@ -28,13 +28,17 @@ MESSAGE = f"Hello from {IAM}!"
 
 #bluetooth params
 
-BLE_NAME = f"{IAM}" 
-BLE_SVC_UUID = bluetooth.UUID(0x181A)
+BLE_NAME = f"" 
+BLE_SVC_UUID = bluetooth.UUID('7DFC9001-7D1C-4951-86AA-8D9728F8D66C') #0x181A
 BLE_CHARACTERISTIC_UUID = bluetooth.UUID(0x2A6E)
+BLE_MANUFACTURER_UUID = bluetooth.UUID(0x000)
 BLE_APPEARANCE = 0X0300
 BLE_ADVERTISING_INTERVAL = 2000
 BLE_SCAN_LENGTH = 5000
 BLE_WINDOW = 30000
+
+# note: 7DFC9001-7D1C-4951-86AA-8D9728F8D66C is airtag characteristic uuid
+
 
 # state variables
 message_count = 0
@@ -161,24 +165,36 @@ async def ble_scan():
     print(f"Scanning for BLE Beacon named {BLE_NAME}...")
 
     async with aioble.scan(BLE_SCAN_LENGTH, interval_us=BLE_ADVERTISING_INTERVAL, window_us=BLE_WINDOW, active=True) as scanner:
+        resList=[]
         async for result in scanner:
             result.charList = ""
             result.nameAttr = str(result.name())
             result.manuList = []
+            for item in result.manufacturer():
+                result.manuList.append(item)
+            try:
+                b=result.manulist[1].byte_decode('utf-8')
+                result.manuList[1]=b
+            except:
+                pass
             for item in result.services():
                 result.charList=f"\"{str(item)}\""
-            print(f"    name: {str(result.name()):<25} services: {result.charList:<20}  rssi: {result.rssi}\n      {result}")
+            print(f"    name: {str(result.nameAttr):<25} services: {str(result.manuList):<30}  rssi: {result.rssi}\n")
             if result.name() == IAM_SENDING_TO and BLE_SVC_UUID in result.services():
                 print(f"found {result.name()} with service uuid {BLE_SVC_UUID}")
                 return result
     return None
 
 """
-reuslt attributes
+result attributes
 ['__class__', '__init__', '__module__', '__qualname__', '__str__', '__dict__',
 'adv_data', 'connectable', 'name', 'resp_data', 'rssi', '_decode_field', '_update', 
 'device', 'manufacturer', 'services', 'charList', 'nameAttr', 'manuList']
+
+(224, b'\x01\x96\xca7v\x91')
 """
+
+
 
 async def run_central_mode():
     #start scanning for a device with the matching service UUID
